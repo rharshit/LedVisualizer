@@ -17,6 +17,7 @@ def get_clockwise_coordinates(length, width):
 
     for y in range(length - 2, 0, -1):
         coords.append((0, y))
+
     return coords
 
 def random_color():

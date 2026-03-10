@@ -1,5 +1,4 @@
 import tkinter as tk
-import random
 
 from color import Color
 from pattern_engine import PatternEngine
@@ -37,7 +36,6 @@ class LEDVisualizer:
         self.root.bind("<Escape>", self.on_escape)    # Escape to close
 
         self.pattern = PatternEngine(ROOM_LENGTH, ROOM_WIDTH, LED_PER_M, UPDATES_PER_SECOND)
-        
         self.update_loop()
 
     def calculate_square_size(self):

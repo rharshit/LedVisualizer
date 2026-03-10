@@ -7,6 +7,7 @@ class PatternEngine:
         self.width = room_width * density
         self.density = density
         self.frequency = frequency
+
         print(f"PatternEngine initialized for room {room_length}m x {room_width}m with density {density} LEDs/m, running at {frequency}Hz")
         print(f"Calculated strip size: {self._get_strip_size()} LEDs, which is {self._get_strip_size_m():.2f} meters")
         print(f"Minimum points: {self._get_min_points()}, Maximum points: {self._get_max_points()}")
