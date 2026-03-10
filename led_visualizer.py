@@ -1,6 +1,8 @@
 import tkinter as tk
 import random
 
+from utils import rgb_to_hex, get_clockwise_coordinates
+
 # Static variables for the rectangle dimensions as requested
 LED_PER_M = 60
 WIDTH = 8*LED_PER_M
@@ -35,7 +37,7 @@ class LEDVisualizer:
         self.canvas = tk.Canvas(frame, width=canvas_width, height=canvas_height, bg="black", highlightthickness=0)
         self.canvas.pack()
         
-        self.square_coords = self.get_clockwise_coordinates()
+        self.square_coords = get_clockwise_coordinates(LENGTH, WIDTH)
 
         self.rects = []
         self.draw_grid()
@@ -61,23 +63,6 @@ class LEDVisualizer:
         
         self.square_size = max(1, min(square_w, square_h))
 
-    def get_clockwise_coordinates(self):
-        coords = []
-        
-        for x in range(WIDTH):
-            coords.append((x, 0))
-
-        for y in range(1, LENGTH - 1):
-            coords.append((WIDTH - 1, y))
-            
-        for x in range(WIDTH - 1, -1, -1):
-            coords.append((x, LENGTH - 1))
-            
-        for y in range(LENGTH - 2, 0, -1):
-            coords.append((0, y))
-        print(f"strip length = {len(coords)} -> ")
-        return coords
-
     def draw_grid(self):
         """Builds out the canvas rectangles corresponding exclusively to the perimeter"""
         for grid_x, grid_y in self.square_coords:
@@ -89,18 +74,12 @@ class LEDVisualizer:
             rect = self.canvas.create_rectangle(x1, y1, x2, y2, outline="", fill="black", width=0)
             self.rects.append(rect)
 
-    def rgb_to_hex(self, rgb):
-        r = max(0, min(255, rgb[0]))
-        g = max(0, min(255, rgb[1]))
-        b = max(0, min(255, rgb[2]))
-        return f"#{r:02x}{g:02x}{b:02x}"
-
     def update_canvas(self):
         rgb_list = generate_pattern()
         
         for i, rgb in enumerate(rgb_list):
             if i < len(self.rects):
-                hex_color = self.rgb_to_hex(rgb)
+                hex_color = rgb_to_hex(rgb)
                 self.canvas.itemconfig(self.rects[i], fill=hex_color)
 
     def on_enter(self, event):
