@@ -2,16 +2,20 @@ import tkinter as tk
 import random
 
 # Static variables for the rectangle dimensions as requested
-WIDTH = 50
-LENGTH = 20
+LED_PER_M = 60
+WIDTH = 8*LED_PER_M
+LENGTH = 4*LED_PER_M
+STRIP_SIZE = 2 * (WIDTH + LENGTH - 2)
 
-def generate_pattern(num_squares):
+print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
+
+def generate_pattern():
     """
     Placeholder function to generate a list of RGB values.
     Returns:
         List of tuples (R, G, B) starting from top-left, moving clockwise.
     """
-    return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(num_squares)]
+    return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(STRIP_SIZE)]
 
 class LEDVisualizer:
     def __init__(self, root):
@@ -32,8 +36,7 @@ class LEDVisualizer:
         self.canvas.pack()
         
         self.square_coords = self.get_clockwise_coordinates()
-        self.num_squares = len(self.square_coords)
-        
+
         self.rects = []
         self.draw_grid()
         
@@ -72,7 +75,7 @@ class LEDVisualizer:
             
         for y in range(LENGTH - 2, 0, -1):
             coords.append((0, y))
-            
+        print(f"strip length = {len(coords)} -> ")
         return coords
 
     def draw_grid(self):
@@ -93,7 +96,7 @@ class LEDVisualizer:
         return f"#{r:02x}{g:02x}{b:02x}"
 
     def update_canvas(self):
-        rgb_list = generate_pattern(self.num_squares)
+        rgb_list = generate_pattern()
         
         for i, rgb in enumerate(rgb_list):
             if i < len(self.rects):
