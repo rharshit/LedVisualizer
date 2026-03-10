@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 
+from color import Color
 from utils import get_clockwise_coordinates
 
 # Static variables for the rectangle dimensions as requested
@@ -11,15 +12,6 @@ STRIP_SIZE = 2 * (WIDTH + LENGTH - 2)
 UPDATES_PER_SECOND = 10
 
 print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
-
-class Color:
-    def __init__(self, r, g, b):
-        self.r = max(0, min(255, r))
-        self.g = max(0, min(255, g))
-        self.b = max(0, min(255, b))
-
-    def to_hex(self):
-        return f"#{self.r:02x}{self.g:02x}{self.b:02x}"
 
 def random_color():
     return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
