@@ -1,7 +1,7 @@
 import tkinter as tk
 import random
 
-from utils import rgb_to_hex, get_clockwise_coordinates
+from utils import get_clockwise_coordinates
 
 # Static variables for the rectangle dimensions as requested
 LED_PER_M = 60
@@ -11,6 +11,18 @@ STRIP_SIZE = 2 * (WIDTH + LENGTH - 2)
 UPDATES_PER_SECOND = 10
 
 print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
+
+class Color:
+    def __init__(self, r, g, b):
+        self.r = max(0, min(255, r))
+        self.g = max(0, min(255, g))
+        self.b = max(0, min(255, b))
+
+    def to_hex(self):
+        return f"#{self.r:02x}{self.g:02x}{self.b:02x}"
+
+def random_color():
+    return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 class LEDVisualizer:
     def __init__(self, root):
@@ -64,11 +76,11 @@ class LEDVisualizer:
             self.rects.append(rect)
 
     def update_canvas(self):
-        rgb_list = self.generate_pattern()
+        color_list: list[Color] = self.generate_pattern()
         
-        for i, rgb in enumerate(rgb_list):
+        for i, color in enumerate(color_list):
             if i < len(self.rects):
-                hex_color = rgb_to_hex(rgb)
+                hex_color = color.to_hex()
                 self.canvas.itemconfig(self.rects[i], fill=hex_color)
 
     def update_loop(self):
@@ -84,7 +96,7 @@ class LEDVisualizer:
         Returns:
             List of tuples (R, G, B) starting from top-left, moving clockwise.
         """
-        return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(STRIP_SIZE)]
+        return [random_color() for _ in range(STRIP_SIZE)]
 
 if __name__ == "__main__":
     app_root = tk.Tk()

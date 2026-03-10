@@ -1,10 +1,3 @@
-def rgb_to_hex(rgb):
-    r = max(0, min(255, rgb[0]))
-    g = max(0, min(255, rgb[1]))
-    b = max(0, min(255, rgb[2]))
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-
 def get_clockwise_coordinates(length, width):
     coords = []
 
