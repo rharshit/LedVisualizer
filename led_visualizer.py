@@ -8,6 +8,7 @@ LED_PER_M = 60
 WIDTH = 8*LED_PER_M
 LENGTH = 4*LED_PER_M
 STRIP_SIZE = 2 * (WIDTH + LENGTH - 2)
+UPDATES_PER_SECOND = 10
 
 print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
 
@@ -42,13 +43,9 @@ class LEDVisualizer:
         self.rects = []
         self.draw_grid()
         
-        self.root.bind("<Return>", self.on_enter)     # Main enter key
-        self.root.bind("<KP_Enter>", self.on_enter)   # Numpad enter key just in case
         self.root.bind("<Escape>", self.on_escape)    # Escape to close
         
-        self.is_processing = False
-        
-        self.update_canvas()
+        self.update_loop()
 
     def calculate_square_size(self):
         screen_w = self.root.winfo_screenwidth()
@@ -82,24 +79,9 @@ class LEDVisualizer:
                 hex_color = rgb_to_hex(rgb)
                 self.canvas.itemconfig(self.rects[i], fill=hex_color)
 
-    def on_enter(self, event):
-        """
-        Triggered when Enter is pressed.
-        Ensures cycle processing and blocks subsequent events until fully rendered.
-        """
-        if self.is_processing:
-            return
-            
-        self.is_processing = True
-        
+    def update_loop(self):
         self.update_canvas()
-        
-        self.canvas.update_idletasks()
-        
-        self.root.after(35, self.unlock_processing)
-        
-    def unlock_processing(self):
-        self.is_processing = False
+        self.root.after(int(1000 / UPDATES_PER_SECOND), self.update_loop)
 
     def on_escape(self, event):
         self.root.destroy()

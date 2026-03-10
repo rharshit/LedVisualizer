@@ -19,5 +19,4 @@ def get_clockwise_coordinates(length, width):
 
     for y in range(length - 2, 0, -1):
         coords.append((0, y))
-    print(f"strip length = {len(coords)} -> ")
     return coords
