@@ -2,19 +2,14 @@ import tkinter as tk
 import random
 
 from color import Color
+from pattern_engine import PatternEngine
 from utils import get_clockwise_coordinates
 
 # Static variables for the rectangle dimensions as requested
 LED_PER_M = 60
-WIDTH = 8*LED_PER_M
-LENGTH = 4*LED_PER_M
-STRIP_SIZE = 2 * (WIDTH + LENGTH - 2)
+ROOM_LENGTH = 4
+ROOM_WIDTH = 8
 UPDATES_PER_SECOND = 10
-
-print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
-
-def random_color():
-    return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 class LEDVisualizer:
     def __init__(self, root):
@@ -25,8 +20,8 @@ class LEDVisualizer:
         
         self.calculate_square_size()
         
-        canvas_width = WIDTH * self.square_size
-        canvas_height = LENGTH * self.square_size
+        canvas_width = LED_PER_M * ROOM_WIDTH * self.square_size
+        canvas_height = LED_PER_M * ROOM_LENGTH * self.square_size
 
         frame = tk.Frame(root)
         frame.pack(padx=30, pady=30)
@@ -34,12 +29,14 @@ class LEDVisualizer:
         self.canvas = tk.Canvas(frame, width=canvas_width, height=canvas_height, bg="black", highlightthickness=0)
         self.canvas.pack()
         
-        self.square_coords = get_clockwise_coordinates(LENGTH, WIDTH)
+        self.square_coords = get_clockwise_coordinates(LED_PER_M * ROOM_LENGTH, LED_PER_M * ROOM_WIDTH)
 
         self.rects = []
         self.draw_grid()
         
         self.root.bind("<Escape>", self.on_escape)    # Escape to close
+
+        self.pattern = PatternEngine(ROOM_LENGTH, ROOM_WIDTH, LED_PER_M, UPDATES_PER_SECOND)
         
         self.update_loop()
 
@@ -51,8 +48,8 @@ class LEDVisualizer:
         max_h = screen_h * 0.95
         padding = min(max_h, max_w) * 0.05
         
-        square_w = int((max_w - padding) // WIDTH)
-        square_h = int((max_h - padding) // LENGTH)
+        square_w = int((max_w - padding) // (LED_PER_M * ROOM_WIDTH))
+        square_h = int((max_h - padding) // (LED_PER_M * ROOM_LENGTH))
         
         self.square_size = max(1, min(square_w, square_h))
 
@@ -68,7 +65,7 @@ class LEDVisualizer:
             self.rects.append(rect)
 
     def update_canvas(self):
-        color_list: list[Color] = self.generate_pattern()
+        color_list: list[Color] = self.pattern.get_next_pattern()
         
         for i, color in enumerate(color_list):
             if i < len(self.rects):
@@ -81,14 +78,6 @@ class LEDVisualizer:
 
     def on_escape(self, event):
         self.root.destroy()
-
-    def generate_pattern(self):
-        """
-        Placeholder function to generate a list of RGB values.
-        Returns:
-            List of tuples (R, G, B) starting from top-left, moving clockwise.
-        """
-        return [random_color() for _ in range(STRIP_SIZE)]
 
 if __name__ == "__main__":
     app_root = tk.Tk()

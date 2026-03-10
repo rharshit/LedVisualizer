@@ -1,3 +1,8 @@
+import random
+
+from color import Color
+
+
 def get_clockwise_coordinates(length, width):
     coords = []
 
@@ -13,3 +18,6 @@ def get_clockwise_coordinates(length, width):
     for y in range(length - 2, 0, -1):
         coords.append((0, y))
     return coords
+
+def random_color():
+    return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
