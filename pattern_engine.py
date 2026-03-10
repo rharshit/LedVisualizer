@@ -12,13 +12,19 @@ class Point:
     def __str__(self):
         return f"{self.color.to_hex()} -> {self.index}"
 
+
+class PointState:
+    def __init__(self, c_point: Point, t_point: Point = None):
+        self.c_point = c_point
+        self.t_point = t_point if t_point else c_point
+
 class PatternEngine:
     def __init__(self, room_length, room_width, density, frequency):
         self.length = room_length * density
         self.width = room_width * density
         self.density = density
         self.frequency = frequency
-        self.current_points = None
+        self.point_states: list[PointState] = []
 
         self._initialize()
 
@@ -28,11 +34,14 @@ class PatternEngine:
 
     def _initialize(self):
         num_points = random.randint(self._get_min_points(), self._get_max_points())
-        points = []
+        point_states = []
         for i in range(num_points):
             index = i * self._get_strip_size() // num_points
-            points.append(Point(index, random_color()))
-        self.current_points = points
+            point_states.append(PointState(Point(index, random_color()), Point(index, random_color())))
+        self.point_states = point_states
+
+    def _get_current_points(self) -> list[Point]:
+        return [p.c_point for p in self.point_states]
 
     def _get_strip_size(self):
         return 2 * (self.width + self.length - 2)
@@ -56,5 +65,6 @@ class PatternEngine:
         return pattern
 
     def _generate_pattern(self):
-        return [Color(0, 0, 0) if i not in [point.index for point in self.current_points] else next(
-            point.color for point in self.current_points if point.index == i) for i in range(self._get_strip_size())]
+        return [Color(0, 0, 0) if i not in [point.index for point in self._get_current_points()] else next(
+            point.color for point in self._get_current_points() if point.index == i) for i in
+                range(self._get_strip_size())]
