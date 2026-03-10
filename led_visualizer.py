@@ -12,14 +12,6 @@ UPDATES_PER_SECOND = 10
 
 print(f"Length: {LENGTH}, Width: {WIDTH}, Strip Size: {STRIP_SIZE}")
 
-def generate_pattern():
-    """
-    Placeholder function to generate a list of RGB values.
-    Returns:
-        List of tuples (R, G, B) starting from top-left, moving clockwise.
-    """
-    return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(STRIP_SIZE)]
-
 class LEDVisualizer:
     def __init__(self, root):
         self.root = root
@@ -72,7 +64,7 @@ class LEDVisualizer:
             self.rects.append(rect)
 
     def update_canvas(self):
-        rgb_list = generate_pattern()
+        rgb_list = self.generate_pattern()
         
         for i, rgb in enumerate(rgb_list):
             if i < len(self.rects):
@@ -85,6 +77,14 @@ class LEDVisualizer:
 
     def on_escape(self, event):
         self.root.destroy()
+
+    def generate_pattern(self):
+        """
+        Placeholder function to generate a list of RGB values.
+        Returns:
+            List of tuples (R, G, B) starting from top-left, moving clockwise.
+        """
+        return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(STRIP_SIZE)]
 
 if __name__ == "__main__":
     app_root = tk.Tk()
