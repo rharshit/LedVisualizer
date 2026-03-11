@@ -5,18 +5,24 @@ from utils import random_color
 
 
 class Point:
-    def __init__(self, index, color: Color):
+    def __init__(self, index: int, color: Color):
         self.index = index
         self.color = color
+        self.target_index = index
+        self.target_color = color
 
     def __str__(self):
         return f"{self.color.to_hex()} -> {self.index}"
 
+    def set_target_index(self, target_index):
+        self.target_index = target_index
 
-class PointState:
-    def __init__(self, c_point: Point, t_point: Point = None):
-        self.c_point = c_point
-        self.t_point = t_point if t_point else c_point
+    def set_target_color(self, target_color):
+        self.target_color = target_color
+
+    # TODO: Implement this
+    def step(self):
+        pass
 
 class PatternEngine:
     def __init__(self, room_length, room_width, density, frequency):
@@ -24,7 +30,7 @@ class PatternEngine:
         self.width = room_width * density
         self.density = density
         self.frequency = frequency
-        self.point_states: list[PointState] = []
+        self.points: list[Point] = []
 
         self._initialize()
 
@@ -34,14 +40,16 @@ class PatternEngine:
 
     def _initialize(self):
         num_points = random.randint(self._get_min_points(), self._get_max_points())
-        point_states = []
+        points: list[Point] = []
         for i in range(num_points):
             index = i * self._get_strip_size() // num_points
-            point_states.append(PointState(Point(index, random_color()), Point(index, random_color())))
-        self.point_states = point_states
+            margin = (self._get_strip_size() // num_points) // 5
+            point = Point((index + random.randint(-margin, margin)) % self._get_strip_size(), random_color())
+            points.append(point)
+        self.points = points
 
-    def _get_current_points(self) -> list[Point]:
-        return [p.c_point for p in self.point_states]
+    def _get_current_points(self) -> dict[int, Color]:
+        return {p.index: p.color for p in self.points}
 
     def _get_strip_size(self):
         return 2 * (self.width + self.length - 2)
@@ -61,10 +69,20 @@ class PatternEngine:
         Returns:
             List of tuples (R, G, B) starting from top-left, moving clockwise.
         """
+        self._take_step()
         pattern = self._generate_pattern()
         return pattern
 
     def _generate_pattern(self):
-        return [Color(0, 0, 0) if i not in [point.index for point in self._get_current_points()] else next(
-            point.color for point in self._get_current_points() if point.index == i) for i in
-                range(self._get_strip_size())]
+        current_points: dict[int, Color] = self._get_current_points()
+        pattern = []
+        for i in range(self._get_strip_size()):
+            if i in current_points:
+                pattern.append(current_points[i])
+            else:
+                pattern.append(Color(0, 0, 0))
+        return pattern
+
+    def _take_step(self):
+        for point in self.points:
+            point.step()
