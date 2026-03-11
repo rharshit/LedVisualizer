@@ -5,14 +5,20 @@ from utils import random_color
 
 
 class Point:
+    INDEX_STEP_FACTOR = 0.75
     def __init__(self, index: int, color: Color):
         self.index = index
         self.color = color
         self.target_index = index
         self.target_color = color
+        self.index_steps = 0
 
     def __str__(self):
         return f"{self.color.to_hex()} -> {self.index}"
+
+    def move(self, index, steps):
+        self.target_index = index
+        self.index_steps = steps
 
     def set_target_index(self, target_index):
         self.target_index = target_index
@@ -20,11 +26,26 @@ class Point:
     def set_target_color(self, target_color):
         self.target_color = target_color
 
-    # TODO: Implement this
-    def step(self):
-        pass
+    # TODO: Fix animation, add color steps
+    def step(self, factor):
+        if self.index_steps > 0:
+            self.index_steps -= 1
+            current_index = self.index
+            target_index = self.target_index
+            step = ((target_index - current_index) * self.INDEX_STEP_FACTOR) / factor
+            if step < 0:
+                step = int(min(-1, step))
+            elif step > 0:
+                step = int(max(1, step))
+            else:
+                step = 0
+            new_index = current_index + step
+            self.index = new_index
+
 
 class PatternEngine:
+    MIN_SEC = 3
+    MAX_SEC = 6
     def __init__(self, room_length, room_width, density, frequency):
         self.length = room_length * density
         self.width = room_width * density
@@ -42,11 +63,13 @@ class PatternEngine:
         num_points = random.randint(self._get_min_points(), self._get_max_points())
         points: list[Point] = []
         for i in range(num_points):
-            index = i * self._get_strip_size() // num_points
-            margin = (self._get_strip_size() // num_points) // 5
-            point = Point((index + random.randint(-margin, margin)) % self._get_strip_size(), random_color())
+            point = Point(self._generate_random_index(i, num_points), random_color())
+            point.move(self._generate_random_index(i, num_points), self._generate_random_step_count())
             points.append(point)
         self.points = points
+
+    def _get_margin(self, num_points):
+        return self._get_strip_size() // num_points // 2
 
     def _get_current_points(self) -> dict[int, Color]:
         return {p.index: p.color for p in self.points}
@@ -62,6 +85,14 @@ class PatternEngine:
 
     def _get_max_points(self):
         return int(self._get_strip_size_m() // 2)
+
+    def _generate_random_index(self, i, num_points):
+        index = i * self._get_strip_size() // num_points
+        margin = self._get_margin(num_points)
+        return (index + random.randint(-margin, margin)) % self._get_strip_size()
+
+    def _generate_random_step_count(self):
+        return random.randint(self.frequency * self.MIN_SEC, self.frequency * self.MAX_SEC)
 
     def get_next_pattern(self):
         """
@@ -85,4 +116,4 @@ class PatternEngine:
 
     def _take_step(self):
         for point in self.points:
-            point.step()
+            point.step(self.frequency)
