@@ -1,14 +1,10 @@
 import tkinter as tk
 
 from color import Color
+from constants import LED_PER_M, ROOM_WIDTH, ROOM_LENGTH, UPDATES_PER_SECOND
 from pattern_engine import PatternEngine
 from utils import get_clockwise_coordinates
 
-# Static variables for the rectangle dimensions as requested
-LED_PER_M = 60
-ROOM_LENGTH = 4
-ROOM_WIDTH = 8
-UPDATES_PER_SECOND = 10
 
 class LEDVisualizer:
     def __init__(self, root):

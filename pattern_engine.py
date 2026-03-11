@@ -1,11 +1,11 @@
 import random
 
 from color import Color
+from constants import INDEX_STEP_FACTOR, ROOM_LENGTH, ROOM_WIDTH, LED_PER_M, UPDATES_PER_SECOND, MIN_SEC, MAX_SEC
 from utils import random_color, is_debugger_active
 
 
 class Point:
-    INDEX_STEP_FACTOR = 0.25
     def __init__(self, index: int, color: Color):
         self.index = index
         self.color = color
@@ -33,25 +33,19 @@ class Point:
             rotated_target = target_index + max_index if target_index < current_index else target_index - max_index
             if abs(rotated_target - current_index) < abs(target_index - current_index):
                 target_index = rotated_target
-        step = int(((target_index - current_index) * self.INDEX_STEP_FACTOR) / factor)
+        step = int(((target_index - current_index) * INDEX_STEP_FACTOR) / factor)
         new_index = (current_index + step) % max_index if max_index else current_index + step
         self.index = new_index
 
 
 class PatternEngine:
-    MIN_SEC = 5
-    MAX_SEC = 10
-    SPREAD = not is_debugger_active()
     def __init__(self, room_length, room_width, density, frequency):
-        self.length = room_length * density
-        self.width = room_width * density
-        self.density = density
-        self.frequency = frequency
         self.points: list[Point] = []
 
         self._initialize()
 
-        print(f"PatternEngine initialized for room {room_length}m x {room_width}m with density {density} LEDs/m, running at {frequency}Hz")
+        print(
+            f"PatternEngine initialized for room {ROOM_LENGTH}m x {ROOM_WIDTH}m with density {LED_PER_M} LEDs/m, running at {UPDATES_PER_SECOND}Hz")
         print(f"Calculated strip size: {self._get_strip_size()} LEDs, which is {self._get_strip_size_m():.2f} meters")
         print(f"Minimum points: {self._get_min_points()}, Maximum points: {self._get_max_points()}")
 
@@ -71,10 +65,10 @@ class PatternEngine:
         return {p.index: p.color for p in self.points}
 
     def _get_strip_size(self):
-        return 2 * (self.width + self.length - 2)
+        return 2 * (ROOM_WIDTH * LED_PER_M + ROOM_LENGTH * LED_PER_M - 2)
 
     def _get_strip_size_m(self):
-        return self._get_strip_size() / self.density
+        return self._get_strip_size() / LED_PER_M
 
     def _get_min_points(self):
         return int(self._get_strip_size_m() // 4)
@@ -88,7 +82,7 @@ class PatternEngine:
         return (index + random.randint(-margin, margin)) % self._get_strip_size()
 
     def _generate_random_step_count(self):
-        return random.randint(self.frequency * self.MIN_SEC, self.frequency * self.MAX_SEC)
+        return random.randint(UPDATES_PER_SECOND * MIN_SEC, UPDATES_PER_SECOND * MAX_SEC)
 
     def get_next_pattern(self):
         """
@@ -104,7 +98,12 @@ class PatternEngine:
         current_points: dict[int, Color] = self._get_current_points()
         pattern = []
         for i in range(self._get_strip_size()):
-            if self.SPREAD:
+            if is_debugger_active():
+                if i in current_points:
+                    pattern.append(current_points[i])
+                else:
+                    pattern.append(Color(0, 0, 0))
+            else:
                 r, g, b = 0, 0, 0
                 total_distance_normalization = 0
                 for point in self.points:
@@ -122,16 +121,11 @@ class PatternEngine:
                     g = int(g / total_distance_normalization)
                     b = int(b / total_distance_normalization)
                     pattern.append(Color(r, g, b))
-            else:
-                if i in current_points:
-                    pattern.append(current_points[i])
-                else:
-                    pattern.append(Color(0, 0, 0))
         return pattern
 
     def _take_step(self):
         for point in self.points:
-            point.step(self.frequency, max_index=self._get_strip_size())
+            point.step(UPDATES_PER_SECOND, max_index=self._get_strip_size())
 
 
 def get_distance(index1: int | Point, index2: int | Point, max_index):
