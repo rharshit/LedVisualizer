@@ -27,11 +27,15 @@ class Point:
         self.target_color = target_color
 
     # TODO: Fix animation, add color steps
-    def step(self, factor):
+    def step(self, factor, max_index=0):
         if self.index_steps > 0:
             self.index_steps -= 1
             current_index = self.index
             target_index = self.target_index
+            if max_index:
+                rotated_target = target_index + max_index if target_index < current_index else target_index - max_index
+                if abs(rotated_target - current_index) < abs(target_index - current_index):
+                    target_index = rotated_target
             step = ((target_index - current_index) * self.INDEX_STEP_FACTOR) / factor
             if step < 0:
                 step = int(min(-1, step))
@@ -39,7 +43,7 @@ class Point:
                 step = int(max(1, step))
             else:
                 step = 0
-            new_index = current_index + step
+            new_index = (current_index + step) % max_index if max_index else current_index + step
             self.index = new_index
 
 
@@ -116,4 +120,4 @@ class PatternEngine:
 
     def _take_step(self):
         for point in self.points:
-            point.step(self.frequency)
+            point.step(self.frequency, max_index=self._get_strip_size())
