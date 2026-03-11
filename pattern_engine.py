@@ -11,6 +11,7 @@ class Point:
         self.color = color
         self.target_index = index
         self.target_color = color
+        self.weight = 1.0
 
     def __str__(self):
         return f"{self.color.to_hex()} -> {self.index}"
@@ -104,14 +105,40 @@ class PatternEngine:
         pattern = []
         for i in range(self._get_strip_size()):
             if self.SPREAD:
-                # TODO: Implement this
-                pattern.append(Color(255, 255, 255))
-            if i in current_points:
-                pattern.append(current_points[i])
+                r, g, b = 0, 0, 0
+                total_distance_normalization = 0
+                for point in self.points:
+                    distance = get_distance(i, point, self._get_strip_size())
+                    if distance == 0:
+                        pattern.append(point.color)
+                        break
+                    distance_normalization = 1 / (distance - 1) if distance > 1 else 1
+                    r += point.color.r * point.weight * distance_normalization
+                    g += point.color.g * point.weight * distance_normalization
+                    b += point.color.b * point.weight * distance_normalization
+                    total_distance_normalization += distance_normalization
+                else:
+                    r = int(r / total_distance_normalization)
+                    g = int(g / total_distance_normalization)
+                    b = int(b / total_distance_normalization)
+                    pattern.append(Color(r, g, b))
             else:
-                pattern.append(Color(0, 0, 0))
+                if i in current_points:
+                    pattern.append(current_points[i])
+                else:
+                    pattern.append(Color(0, 0, 0))
         return pattern
 
     def _take_step(self):
         for point in self.points:
             point.step(self.frequency, max_index=self._get_strip_size())
+
+
+def get_distance(index1: int | Point, index2: int | Point, max_index):
+    if isinstance(index1, Point):
+        index1 = index1.index
+    if isinstance(index2, Point):
+        index2 = index2.index
+    direct_distance = abs(index1 - index2)
+    wrapped_distance = max_index - direct_distance
+    return min(direct_distance, wrapped_distance)
