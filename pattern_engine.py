@@ -44,6 +44,7 @@ class Point:
 
 class PatternEngine:
     def __init__(self):
+        self.next_randomness = 0
         self.points: list[Point] = []
         self._initialize()
         print(f"PatternEngine initialized for room {ROOM_LENGTH}m x {ROOM_WIDTH}m"
@@ -110,8 +111,48 @@ class PatternEngine:
         if to_remove:
             for point in to_remove:
                 self.points.remove(point)
+        if self.next_randomness <= 0:
+            self._add_randomness()
         for point in self.points:
             point.step(UPDATES_PER_SECOND, max_index=get_strip_size())
+        self.next_randomness -= 1
+
+    def _get_random_event(self):
+        def event_key(difference):
+            if difference < 0:
+                return -1
+            elif difference > 0:
+                return 1
+            else:
+                return 0
+
+        num_points = len(self.points)
+        event_probability = [event_key(possibility - num_points) for possibility in
+                             range(get_min_points(), get_max_points() + 1)] + [0] * (
+                                        get_max_points() - get_min_points() + 1)
+        return random.choice(event_probability)
+
+    def _add_randomness(self):
+        event = self._get_random_event()
+        self._process_event(event)
+        self.next_randomness = random.randint(0, UPDATES_PER_SECOND * 2)
+
+    def _process_event(self, event):
+        if event == 1:
+            self._add_random_point()
+        elif event == -1:
+            self._remove_random_point()
+        else:
+            self._change_random_point()
+
+    def _add_random_point(self):
+        print("  .")
+
+    def _remove_random_point(self):
+        print(".  ")
+
+    def _change_random_point(self):
+        print(" . ")
 
 
 def get_distance(index1: int | Point, index2: int | Point, max_index):
