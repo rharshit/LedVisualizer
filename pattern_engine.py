@@ -106,6 +106,10 @@ class PatternEngine:
 
 
     def _take_step(self):
+        to_remove = [point for point in self.points if point.weight == 0]
+        if to_remove:
+            for point in to_remove:
+                self.points.remove(point)
         for point in self.points:
             point.step(UPDATES_PER_SECOND, max_index=get_strip_size())
 
