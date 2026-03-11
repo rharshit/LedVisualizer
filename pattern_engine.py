@@ -5,20 +5,18 @@ from utils import random_color
 
 
 class Point:
-    INDEX_STEP_FACTOR = 0.75
+    INDEX_STEP_FACTOR = 0.25
     def __init__(self, index: int, color: Color):
         self.index = index
         self.color = color
         self.target_index = index
         self.target_color = color
-        self.index_steps = 0
 
     def __str__(self):
         return f"{self.color.to_hex()} -> {self.index}"
 
-    def move(self, index, steps):
+    def move(self, index):
         self.target_index = index
-        self.index_steps = steps
 
     def set_target_index(self, target_index):
         self.target_index = target_index
@@ -28,23 +26,15 @@ class Point:
 
     # TODO: Fix animation, add color steps
     def step(self, factor, max_index=0):
-        if self.index_steps > 0:
-            self.index_steps -= 1
-            current_index = self.index
-            target_index = self.target_index
-            if max_index:
-                rotated_target = target_index + max_index if target_index < current_index else target_index - max_index
-                if abs(rotated_target - current_index) < abs(target_index - current_index):
-                    target_index = rotated_target
-            step = ((target_index - current_index) * self.INDEX_STEP_FACTOR) / factor
-            if step < 0:
-                step = int(min(-1, step))
-            elif step > 0:
-                step = int(max(1, step))
-            else:
-                step = 0
-            new_index = (current_index + step) % max_index if max_index else current_index + step
-            self.index = new_index
+        current_index = self.index
+        target_index = self.target_index
+        if max_index:
+            rotated_target = target_index + max_index if target_index < current_index else target_index - max_index
+            if abs(rotated_target - current_index) < abs(target_index - current_index):
+                target_index = rotated_target
+        step = int(((target_index - current_index) * self.INDEX_STEP_FACTOR) / factor)
+        new_index = (current_index + step) % max_index if max_index else current_index + step
+        self.index = new_index
 
 
 class PatternEngine:
@@ -68,7 +58,7 @@ class PatternEngine:
         points: list[Point] = []
         for i in range(num_points):
             point = Point(self._generate_random_index(i, num_points), random_color())
-            point.move(self._generate_random_index(i, num_points), self._generate_random_step_count())
+            point.move(self._generate_random_index(i, num_points))
             points.append(point)
         self.points = points
 
