@@ -1,4 +1,5 @@
 import random
+import sys
 
 from color import Color
 
@@ -22,3 +23,8 @@ def get_clockwise_coordinates(length, width):
 
 def random_color():
     return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+
+def is_debugger_active() -> bool:
+    """Return if the debugger is currently active"""
+    return hasattr(sys, 'gettrace') and (sys.gettrace() is not None or sys.breakpointhook.__module__ != "sys")

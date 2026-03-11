@@ -1,7 +1,7 @@
 import random
 
 from color import Color
-from utils import random_color
+from utils import random_color, is_debugger_active
 
 
 class Point:
@@ -40,6 +40,7 @@ class Point:
 class PatternEngine:
     MIN_SEC = 5
     MAX_SEC = 10
+    SPREAD = not is_debugger_active()
     def __init__(self, room_length, room_width, density, frequency):
         self.length = room_length * density
         self.width = room_width * density
@@ -102,6 +103,9 @@ class PatternEngine:
         current_points: dict[int, Color] = self._get_current_points()
         pattern = []
         for i in range(self._get_strip_size()):
+            if self.SPREAD:
+                # TODO: Implement this
+                pattern.append(Color(255, 255, 255))
             if i in current_points:
                 pattern.append(current_points[i])
             else:
