@@ -48,8 +48,8 @@ class Point:
 
 
 class PatternEngine:
-    MIN_SEC = 3
-    MAX_SEC = 6
+    MIN_SEC = 5
+    MAX_SEC = 10
     def __init__(self, room_length, room_width, density, frequency):
         self.length = room_length * density
         self.width = room_width * density
