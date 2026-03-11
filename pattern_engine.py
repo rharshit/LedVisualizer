@@ -10,7 +10,7 @@ class Point:
         self.index = index
         self.color = color
         self.target_index = index
-        self.target_color = color
+        self.target_color = random_color()
         self.weight = 1.0
 
     def __str__(self):
@@ -25,7 +25,6 @@ class Point:
     def set_target_color(self, target_color):
         self.target_color = target_color
 
-    # TODO: Fix animation, add color steps
     def step(self, factor, max_index=0):
         current_index = self.index
         target_index = self.target_index
@@ -36,6 +35,11 @@ class Point:
         step = int(((target_index - current_index) * INDEX_STEP_FACTOR) / factor)
         new_index = (current_index + step) % max_index if max_index else current_index + step
         self.index = new_index
+
+        r_step = int(((self.target_color.r - self.color.r) * INDEX_STEP_FACTOR) / factor)
+        g_step = int(((self.target_color.g - self.color.g) * INDEX_STEP_FACTOR) / factor)
+        b_step = int(((self.target_color.b - self.color.b) * INDEX_STEP_FACTOR) / factor)
+        self.color = Color(self.color.r + r_step, self.color.g + g_step, self.color.b + b_step)
 
 
 class PatternEngine:
