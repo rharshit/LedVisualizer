@@ -32,10 +32,12 @@ class LEDVisualizer:
 
         self.rects = []
         self.draw_grid()
-        
-        self.root.bind("<Escape>", self.on_escape)    # Escape to close
 
         self.pattern = PatternEngine(ROOM_LENGTH, ROOM_WIDTH, LED_PER_M, UPDATES_PER_SECOND)
+
+        self.root.bind("<Escape>", self.on_escape)    # Escape to close
+        self.root.bind("<Return>", self.on_enter)  # Enter to refresh pattern
+
         self.update_loop()
 
     def calculate_square_size(self):
@@ -76,6 +78,9 @@ class LEDVisualizer:
 
     def on_escape(self, event):
         self.root.destroy()
+
+    def on_enter(self, event):
+        self.pattern._initialize()
 
 if __name__ == "__main__":
     app_root = tk.Tk()
