@@ -29,7 +29,7 @@ class LEDVisualizer:
         self.rects = []
         self.draw_grid()
 
-        self.pattern = PatternEngine(ROOM_LENGTH, ROOM_WIDTH, LED_PER_M, UPDATES_PER_SECOND)
+        self.pattern = PatternEngine()
 
         self.root.bind("<Escape>", self.on_escape)    # Escape to close
         self.root.bind("<Return>", self.on_enter)  # Enter to refresh pattern
