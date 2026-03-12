@@ -178,7 +178,7 @@ def get_min_points():
 
 
 def get_max_points():
-    return int(get_strip_size_m() // 2)
+    return int(get_strip_size_m() // 3)
 
 
 def get_margin(num_points):
