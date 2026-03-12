@@ -2,6 +2,7 @@ import random
 import sys
 
 from color import Color
+from constants import COLORS
 
 
 def get_clockwise_coordinates(length, width):
@@ -22,7 +23,8 @@ def get_clockwise_coordinates(length, width):
     return coords
 
 def random_color():
-    return Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    r, g, b = random.choice(COLORS)
+    return Color(r, g, b)
 
 
 def is_debugger_active() -> bool:
